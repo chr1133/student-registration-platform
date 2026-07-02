@@ -1,6 +1,9 @@
 import { NavLink } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 
 function Navbar() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <header className="navbar">
       <div className="navbar-brand">
@@ -21,20 +24,12 @@ function Navbar() {
         <NavLink to="/register" className={({ isActive }) => (isActive ? "top-link active" : "top-link")}>
           ➕ Add Student
         </NavLink>
-        {/* Placeholder links — not wired to pages yet */}
-        <span className="top-link disabled" title="Coming soon">📊 Reports</span>
-        <span className="top-link disabled" title="Coming soon">👤 Profile</span>
       </nav>
 
       <div className="navbar-right">
-        <button className="icon-btn" title="Toggle theme">☀️</button>
-        <div className="admin-chip">
-          <div className="admin-avatar">AD</div>
-          <div>
-            <p className="admin-name">Admin</p>
-            <p className="admin-role">Administrator</p>
-          </div>
-        </div>
+        <button className="icon-btn" title="Toggle theme" onClick={toggleTheme}>
+          {theme === "light" ? "☀️" : "🌙"}
+        </button>
       </div>
     </header>
   );
