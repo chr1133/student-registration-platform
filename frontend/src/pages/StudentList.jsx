@@ -110,9 +110,15 @@ function StudentList() {
                   <td>{s.email}</td>
                   <td>{formatDate(s.created_at)}</td>
                   <td className="actions">
-                    <button className="action-btn view" title="View" onClick={() => navigate(`/students/${s.id}`)}>👁</button>
-                    <button className="action-btn edit" title="Edit" onClick={() => navigate(`/students/${s.id}/edit`)}>✏</button>
-                    <button className="action-btn delete" title="Delete" onClick={() => handleDelete(s.id, s.full_name)}>🗑</button>
+                    <button className="action-btn view" title="View" onClick={() => navigate(`/students/${s.id}`)}>
+                      👁 View
+                    </button>
+                    <button className="action-btn edit" title="Edit" onClick={() => navigate(`/students/${s.id}/edit`)}>
+                      ✏ Edit
+                    </button>
+                    <button className="action-btn delete" title="Delete" onClick={() => handleDelete(s.id, s.full_name)}>
+                      🗑 Delete
+                    </button>
                   </td>
                 </tr>
               ))}
