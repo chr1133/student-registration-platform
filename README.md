@@ -1,4 +1,4 @@
-STUDENT REGISTRATION PLATFORM
+Christian Elias-STUDENT REGISTRATION PLATFORM
 * A full-stack Student Registration System built with React, Node.js, Express, and SQLite for managing student records.
 
 ** Features
