@@ -1,57 +1,82 @@
 # Student Registration Platform - Run Script for Windows
-# This PowerShell script sets up and runs the application
+# This PowerShell script starts both backend and frontend servers
 
-Write-Host "=== Student Registration Platform Setup ===" -ForegroundColor Yellow
+param(
+    [switch]$Detach  # Run servers in background
+)
+
+$ErrorActionPreference = "Stop"
+
+$projectRoot = "C:\Users\Tempo\student-registration-platform"
+$backendDir = Join-Path $projectRoot "backend"
+$frontendDir = Join-Path $projectRoot "frontend"
+
+Write-Host "=== Student Registration Platform ===" -ForegroundColor Cyan
 Write-Host ""
 
-# Check if Node.js is installed
-Write-Host "Checking Node.js installation..." -ForegroundColor Cyan
-try {
-    $nodeVersion = node --version 2>$null
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "Node.js is installed: $nodeVersion" -ForegroundColor Green
-    } else {
-        Write-Host "Node.js is not installed. Please install Node.js first." -ForegroundColor Red
-        exit 1
-    }
-} catch {
-    Write-Host "Node.js is not installed. Please install Node.js first." -ForegroundColor Red
+# Check prerequisites
+Write-Host "Checking prerequisites..." -ForegroundColor Yellow
+$nodeVersion = node --version 2>$null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Error: Node.js not installed." -ForegroundColor Red
     exit 1
 }
+Write-Host "  Node.js: $nodeVersion" -ForegroundColor Green
 
-Write-Host ""
-
-# Backend Setup
-Write-Host "=== Setting up Backend ===" -ForegroundColor Yellow
-Set-Location backend
-
-if (-not (Test-Path "node_modules")) {
-    Write-Host "Installing backend dependencies..." -ForegroundColor Cyan
-    npm install
-} else {
-    Write-Host "Backend dependencies already installed" -ForegroundColor Green
+# Install dependencies if needed
+if (-not (Test-Path (Join-Path $backendDir "node_modules"))) {
+    Write-Host "Installing backend dependencies..." -ForegroundColor Yellow
+    Set-Location $backendDir
+    npm install | Out-Null
 }
+Write-Host "  Backend dependencies: OK" -ForegroundColor Green
 
-Write-Host ""
-
-# Frontend Setup
-Write-Host "=== Setting up Frontend ===" -ForegroundColor Yellow
-Set-Location "../frontend"
-
-if (-not (Test-Path "node_modules")) {
-    Write-Host "Installing frontend dependencies..." -ForegroundColor Cyan
-    npm install
-} else {
-    Write-Host "Frontend dependencies already installed" -ForegroundColor Green
+if (-not (Test-Path (Join-Path $frontendDir "node_modules"))) {
+    Write-Host "Installing frontend dependencies..." -ForegroundColor Yellow
+    Set-Location $frontendDir
+    npm install | Out-Null
 }
+Write-Host "  Frontend dependencies: OK" -ForegroundColor Green
 
 Write-Host ""
-Write-Host "=== Setup Complete ===" -ForegroundColor Green
+
+# Start backend server
+Write-Host "=== Starting Backend Server ===" -ForegroundColor Yellow
+$backendJob = Start-Job -ScriptBlock {
+    Set-Location "C:\Users\Tempo\student-registration-platform\backend"
+    node server.js
+}
+Start-Sleep -Seconds 2
+Write-Host "  Backend: http://localhost:5000" -ForegroundColor Green
+
+# Start frontend dev server
+Write-Host "=== Starting Frontend Dev Server ===" -ForegroundColor Yellow
+$frontendJob = Start-Job -ScriptBlock {
+    Set-Location "C:\Users\Tempo\student-registration-platform\frontend"
+    npm run dev
+}
+Start-Sleep -Seconds 3
+Write-Host "  Frontend: http://localhost:5173" -ForegroundColor Green
+
 Write-Host ""
-Write-Host "To run the application:" -ForegroundColor Cyan
-Write-Host "  1. Start backend: cd backend; npm start" -ForegroundColor White
-Write-Host "  2. Start frontend: cd frontend; npm run dev" -ForegroundColor White
+Write-Host "=== Application Running ===" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Backend runs on: http://localhost:5000" -ForegroundColor White
-Write-Host "Frontend runs on: http://localhost:5173" -ForegroundColor White
+Write-Host "  Frontend: http://localhost:5173" -ForegroundColor White
+Write-Host "  Backend:  http://localhost:5000" -ForegroundColor White
 Write-Host ""
+Write-Host "To stop servers: Stop-Job -Name $backendJob.Name, $frontendJob.Name" -ForegroundColor Gray
+
+if ($Detach) {
+    Write-Host ""
+    Write-Host "Servers running in background." -ForegroundColor Green
+} else {
+    Write-Host ""
+    Write-Host "Press Ctrl+C to exit..." -ForegroundColor Gray
+    try {
+        while ($true) { Start-Sleep -Seconds 1 }
+    } finally {
+        Write-Host "`nStopping servers..." -ForegroundColor Yellow
+        $backendJob | Stop-Job
+        $frontendJob | Stop-Job
+    }
+}
