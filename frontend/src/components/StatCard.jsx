@@ -1,16 +1,47 @@
-function StatCard({ label, value, icon, iconBg, iconColor, trendText, trendColor }) {
+import React from "react";
+import { TrendingUp, TrendingDown } from "lucide-react";
+
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  iconBg = "var(--primary-light)",
+  iconColor = "var(--primary)",
+  trendText,
+  trendPositive = true,
+  subtext,
+}) {
   return (
     <div className="stat-card">
-      <div className="stat-icon" style={{ background: iconBg, color: iconColor }}>
-        {icon}
-      </div>
-      <div>
-        <p className="stat-label">{label}</p>
-        <p className="stat-value">{value}</p>
+      <div className="stat-info">
+        <span className="stat-label">{label}</span>
+        <span className="stat-value">{value}</span>
         {trendText && (
-          <p className="stat-trend" style={{ color: trendColor }}>
-            {trendText} ↗
-          </p>
+          <div
+            className="stat-badge"
+            style={{
+              background: trendPositive ? "var(--sage-light)" : "var(--terracotta-light)",
+              color: trendPositive ? "var(--sage)" : "var(--terracotta)",
+            }}
+          >
+            {trendPositive ? (
+              <TrendingUp style={{ width: 13, height: 13 }} />
+            ) : (
+              <TrendingDown style={{ width: 13, height: 13 }} />
+            )}
+            <span>{trendText}</span>
+          </div>
+        )}
+        {subtext && !trendText && (
+          <span style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{subtext}</span>
+        )}
+      </div>
+
+      <div className="stat-icon-wrap" style={{ background: iconBg, color: iconColor }}>
+        {typeof Icon === "function" || (typeof Icon === "object" && Icon !== null) ? (
+          <Icon style={{ width: 22, height: 22 }} />
+        ) : (
+          <span style={{ fontSize: 20 }}>{Icon}</span>
         )}
       </div>
     </div>
