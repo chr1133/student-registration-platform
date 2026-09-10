@@ -37,7 +37,7 @@ function ConfirmDialog({ isOpen, onClose, onConfirm, title, message, confirmText
               color: "var(--status-danger)",
               display: "flex",
               alignItems: "center",
-              justify-content: "center",
+              justifyContent: "center",
               flexShrink: 0,
             }}
           >
